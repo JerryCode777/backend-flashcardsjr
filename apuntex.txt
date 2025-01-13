@@ -1,0 +1,5 @@
+endpoints para flashcards son:
+GET /api/flashcards => listar
+POST /api/flashcards => crear
+PUT /api/flashcards/id => actualizar
+DELETE /api/flashcards/id => eliminar
