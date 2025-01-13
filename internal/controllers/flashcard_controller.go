@@ -9,8 +9,8 @@ import (
 
     "github.com/gorilla/mux"
 
-    "backend/internal/db"
-    "backend/internal/models"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/db"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/models"
 )
 
 // Flashcards maneja GET (listar) y POST (crear) flashcards para un usuario

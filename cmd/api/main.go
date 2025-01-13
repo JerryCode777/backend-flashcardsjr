@@ -1,38 +1,51 @@
+// cmd/api/main.go
 package main
 
 import (
-    "fmt"
-    "log"
-    "net/http"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
-    "github.com/gorilla/handlers"
+	"github.com/gorilla/handlers"
+	"github.com/joho/godotenv" // Para cargar .env en desarrollo
 
-	"backend/internal/db"
-	"backend/internal/routes"
-
+    "github.com/JerryCode777/backend-flashcardsjr/internal/db"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/routes"
 )
 
 const serverAddress = ":3000"
 
 func main() {
-    // 1. Inicializar la BD
-    if err := db.ConnectDB("postgres://flashcards_db_ctan_user:4P8hG4MnihvH1HqflO8YNG4OLN2S6G7B@dpg-cu2o9aq3esus73clr9o0-a.oregon-postgres.render.com:5432/flashcards_db_ctan?sslmode=require"); err != nil {
-        log.Fatalf("Error al conectar a la BD: %v\n", err)
-    }
-    defer db.CloseDB()
-    fmt.Println("Conexión exitosa a la base de datos.")
+	// Cargar variables de entorno desde el archivo .env (solo para desarrollo)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No se pudo cargar el archivo .env, se usarán las variables de entorno del sistema")
+	}
 
-    // 2. Configurar rutas
-    router := routes.SetupRoutes()
+	// Obtener la cadena de conexión desde la variable de entorno
+	connStr := os.Getenv("DATABASE_URL")
+	if connStr == "" {
+		log.Fatal("La variable de entorno DATABASE_URL no está definida")
+	}
 
-    // 3. Configurar CORS si lo requieres
-    corsHandler := handlers.CORS(
-        handlers.AllowedOrigins([]string{"http://127.0.0.1:5500", "http://localhost:8080"}),
-        handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
-        handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
-    )
+	// 1. Inicializar la BD
+	if err := db.ConnectDB(connStr); err != nil {
+		log.Fatalf("Error al conectar a la BD: %v\n", err)
+	}
+	defer db.CloseDB()
+	fmt.Println("Conexión exitosa a la base de datos.")
 
-    // 4. Iniciar servidor
-    fmt.Printf("Servidor corriendo en http://localhost%s\n", serverAddress)
-    log.Fatal(http.ListenAndServe(serverAddress, corsHandler(router)))
+	// 2. Configurar rutas
+	router := routes.SetupRoutes()
+
+	// 3. Configurar CORS
+	corsHandler := handlers.CORS(
+		handlers.AllowedOrigins([]string{"http://127.0.0.1:5500", "http://localhost:8080"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+	)
+
+	// 4. Iniciar servidor
+	fmt.Printf("Servidor corriendo en http://localhost%s\n", serverAddress)
+	log.Fatal(http.ListenAndServe(serverAddress, corsHandler(router)))
 }

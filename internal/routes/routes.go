@@ -4,8 +4,8 @@ package routes
 import (
     "github.com/gorilla/mux"
 
-	"backend/internal/controllers"
-    "backend/internal/middleware"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/controllers"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/middleware"
 )
 
 // SetupRoutes configura todas las rutas de la app

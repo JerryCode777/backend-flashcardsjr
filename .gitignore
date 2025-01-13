@@ -1,0 +1,14 @@
+# .gitignore
+
+# Ignorar variables de entorno
+.env
+
+# Otros archivos que no se quieran subir:
+# Binarios compilados de Go
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Directorio de dependencias
+/vendor/

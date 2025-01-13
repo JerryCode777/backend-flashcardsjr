@@ -10,9 +10,9 @@ import (
     "github.com/golang-jwt/jwt/v4"
     "golang.org/x/crypto/bcrypt"
 
-    "backend/internal/db"
-    "backend/internal/middleware"
-    "backend/internal/models"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/db"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/middleware"
+    "github.com/JerryCode777/backend-flashcardsjr/internal/models"
 )
 
 // Register crea un nuevo usuario
