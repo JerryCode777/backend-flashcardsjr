@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv" // Para cargar .env en desarrollo
@@ -13,8 +14,6 @@ import (
     "github.com/JerryCode777/backend-flashcardsjr/internal/db"
     "github.com/JerryCode777/backend-flashcardsjr/internal/routes"
 )
-
-const serverAddress = ":3000"
 
 func main() {
 	// Cargar variables de entorno desde el archivo .env (solo para desarrollo)
@@ -28,24 +27,33 @@ func main() {
 		log.Fatal("La variable de entorno DATABASE_URL no está definida")
 	}
 
-	// 1. Inicializar la BD
+	// Conectar a la base de datos
 	if err := db.ConnectDB(connStr); err != nil {
 		log.Fatalf("Error al conectar a la BD: %v\n", err)
 	}
 	defer db.CloseDB()
 	fmt.Println("Conexión exitosa a la base de datos.")
 
-	// 2. Configurar rutas
+	// Configurar rutas
 	router := routes.SetupRoutes()
 
-	// 3. Configurar CORS
+	// Configurar CORS para la dirección de Render
 	corsHandler := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://127.0.0.1:5500", "http://localhost:8080"}),
+		handlers.AllowedOrigins([]string{
+			"https://backend-flashcardsjr.onrender.com",
+		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
-	// 4. Iniciar servidor
-	fmt.Printf("Servidor corriendo en http://localhost%s\n", serverAddress)
+	// Obtener el puerto desde la variable de entorno PORT
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("La variable de entorno PORT no está definida")
+	}
+	serverAddress := ":" + port
+
+	// Iniciar servidor
+	fmt.Printf("Servidor corriendo en https://backend-flashcardsjr.onrender.com\n")
 	log.Fatal(http.ListenAndServe(serverAddress, corsHandler(router)))
 }
